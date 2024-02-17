@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutors List</title>
+    <title>{{ tutor.name }}'s Tutor Profile</title>
 </head>
 
 <body>
-    <h1>Browse Tutors</h1>
+    <h1>{{ tutor.name }}'s Tutor Profile</h1>
 
     <table>
         <thead>
@@ -19,13 +19,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for tutor in tutors %}
             <tr>
-                <td>{{ tutor.tutor_id }}</td>
+                <td>{{ tutor.id }}</td>
                 <td>{{ tutor.name }}</td>
                 <td>{{ tutor.email }}</td>
             </tr>
-            {% endfor %}
         </tbody>
     </table>
 
