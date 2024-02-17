@@ -1,12 +1,15 @@
 import pytest
+
 from tutor_app.app import app as flask_app
 
 
 @pytest.fixture()
 def app():
-    flask_app.config.update({
-        "TESTING": True,
-    })
+    flask_app.config.update(
+        {
+            "TESTING": True,
+        }
+    )
 
     # other setup can go here
     yield flask_app
@@ -26,4 +29,3 @@ def runner(app):
 def test_request_example(client):
     response = client.get("/")
     assert response.status_code == 200
-    
