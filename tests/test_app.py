@@ -217,7 +217,7 @@ def test_tutor_login_post_success(client):
 def test_tutor_login_post_failure(client):
     """
     Test that trying to login as a tutor with either the wrong credentials
-    will not cause any changes the current user session states,
+    will set the curent user session states to None,
     and will return the appropriate error message to the user on the page.
     """
     invalid_password = "123"
@@ -252,8 +252,76 @@ def test_tutor_login_post_failure(client):
 
 
 def test_tutor_account_success(client):
-    pass
+    """
+    Test that logging in as a tutor enables access
+    to your tutor account based on ID.
+    """
+    # Successfully log in as a tutor
+    response = client.post(
+        "/tutor-login",
+        data={
+            "email": "john.doe@tutorplanet.co.uk",
+            "password": "password",
+        },
+    )
+    assert response.status_code == 200
+    # Successfully access the unique tutor account page
+    tutor_id = Tutor.query.filter_by(email="john.doe@tutorplanet.co.uk")[0].tutor_id
+    response = client.get(f"/tutor-{tutor_id}-account")
+    assert response.status_code == 200
+    assert b"your tutor account</h2>" in response.data
 
 
-def test_tutor_account_failure(client):
-    pass
+def test_tutor_account_failure_as_another_tutor(client):
+    """
+    Test that logging in as a tutor prevents access
+    to other tutors' account pages based on ID.
+    """
+    # Successfully log in as a tutor
+    response = client.post(
+        "/tutor-login",
+        data={
+            "email": "john.doe@tutorplanet.co.uk",
+            "password": "password",
+        },
+    )
+    assert response.status_code == 200
+    # Fail to access another tutor's account page
+    tutor_id = Tutor.query.filter_by(email="jane.smith@tutorplanet.co.uk")[0].tutor_id
+    response = client.get(f"/tutor-{tutor_id}-account")
+    assert response.status_code == 200
+    assert (
+        b"<p>Sorry, you do not have permission to access this page. Please log in.</p>"
+        in response.data
+    )
+
+
+def test_tutor_account_failure_not_logged_in(client):
+    """
+    Test that not being logged in prevents access to any tutors' account pages.
+    """
+    # Access the tutor login page to allow access to the session
+    response = client.get("/tutor-login")
+    assert response.status_code == 200
+    # Assert that the user is not logged in
+    if "current_user_id" not in session:
+        assert "current_user_id" not in session
+    else:
+        assert session["current_user_id"] is None
+
+    # Fail to access any tutor account pages
+    tutor_id = Tutor.query.filter_by(email="jane.smith@tutorplanet.co.uk")[0].tutor_id
+    response = client.get(f"/tutor-{tutor_id}-account")
+    assert response.status_code == 200
+    assert (
+        b"<p>Sorry, you do not have permission to access this page. Please log in.</p>"
+        in response.data
+    )
+
+    tutor_id = Tutor.query.filter_by(email="john.doe@tutorplanet.co.uk")[0].tutor_id
+    response = client.get(f"/tutor-{tutor_id}-account")
+    assert response.status_code == 200
+    assert (
+        b"<p>Sorry, you do not have permission to access this page. Please log in.</p>"
+        in response.data
+    )
