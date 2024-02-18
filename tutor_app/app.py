@@ -19,7 +19,6 @@ engine = create_engine(DATABASE_URL)
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-app.secret_key = "my_secret_key"
 
 db = SQLAlchemy(app)
 
@@ -104,14 +103,6 @@ def tutor_login():
 
 @app.route("/tutor-<int:tutor_id>-account")
 def tutor_account(tutor_id):
-    # current_user_id = session["current_user_id"]
-    # current_user_type = session["current_user_type"]
-    # logging.info(f"current_user_id={current_user_id}, current_user_type={current_user_type}")
-
-    # tutor = Tutor.query.get_or_404(tutor_id)
-
-    # return render_template("tutor-account.html", tutor=tutor)
-
     if "current_user_id" not in session:
         session["current_user_id"] = None
         session["current_user_type"] = None

@@ -1,8 +1,13 @@
 import pytest
+from flask import session
 
 from tutor_app.app import Tutor
 from tutor_app.app import app as flask_app
 from tutor_app.app import db
+
+# Fixtures are used to enable the test functions to set up and tear down instances of the app
+# without having to repea the code every time.
+# Only need to pass the fixture name as an argument to each test function
 
 
 @pytest.fixture()
@@ -36,6 +41,10 @@ def runner(test_app):
 
 
 def test_seed_data(client):
+    """
+    Test that the client test fixture has added the seed data as expected.
+    Also testing that the database table, Tutor, can be queried.
+    """
     tutors = Tutor.query.all()
     assert len(tutors) == 2
     assert all([isinstance(tutor, Tutor) for tutor in tutors])
@@ -44,6 +53,11 @@ def test_seed_data(client):
 
 
 def test_homepage(client):
+    """
+    Test that the web app's root returns an ok response when retrieved,
+    and that the page contains two of the expected headers.
+    This ensures the correct html template is being used.
+    """
     response = client.get("/")
     assert response.status_code == 200
     assert b"<h1>Tutor Planet</h1>" in response.data
@@ -51,24 +65,42 @@ def test_homepage(client):
 
 
 def test_browse_tutors(client):
+    """
+    Test that Browse Tutors page returns an ok response when retrieved,
+    and that the page contains the expected header and a table element for listing tutors.
+    This ensures the correct html template is being used.
+    """
     response = client.get("/browse-tutors")
     assert response.status_code == 200
+    assert b"<h2>Browse Tutors</h2>" in response.data
+    assert b"</table>" in response.data
 
 
 def test_tutor_signup_get(client):
+    """
+    Test that Tutor Sign Up page returns an ok response when retrieved,
+    and that the page contains the expected form element for inputting data
+    and a button element to post the data.
+    This ensures the correct html template is being used.
+    """
     response = client.get("/tutor-signup")
+    assert response.status_code == 200
     assert b'<form id="tutor-signup-form">' in response.data
     assert b'<button type="submit">Sign Up</button>' in response.data
-    assert response.status_code == 200
 
 
 def test_tutor_signup_post_success(client):
+    """
+    Test that a post request made to sign up a new tutor can successfully
+    add a new entry to the Tutor table in the database,
+    and returns a message to the user displayed on the page.
+    """
     response = client.post(
         "/tutor-signup",
         data={
             "name": "Samantha Doe",
             "email": "samantha@example.com",
-            "password": "my_password",
+            "password": "password",
         },
     )
     assert response.status_code == 200
@@ -77,6 +109,11 @@ def test_tutor_signup_post_success(client):
 
 
 def test_tutor_signup_post_failure(client):
+    """
+    Test that trying to sign up as a tutor with an existing tutor's email
+    will not cause any changes in the database's Tutor table
+    and will return the appropriate error message to the user on the page.
+    """
     existing_users_name = "John Doe"
     new_users_name = "Johnny Doe"
 
@@ -85,7 +122,7 @@ def test_tutor_signup_post_failure(client):
         data={
             "name": new_users_name,
             "email": "john.doe@tutorplanet.co.uk",
-            "password": "my_password",
+            "password": "password",
         },
     )
     assert response.status_code == 200
@@ -97,3 +134,126 @@ def test_tutor_signup_post_failure(client):
         response.json["message"]
         == "The email you have entered is already in use for an existing tutor account."
     )
+
+
+def test_tutor_profile_success(client):
+    """
+    Test that a Tutor Profile page can be retrieved using an existing tutor ID,
+    and that the page contains the expected header element.
+    This ensures the correct html template is being used.
+    """
+    existing_tutor = Tutor.query.first()
+    assert existing_tutor is not None
+    response = client.get(f"/tutor-{existing_tutor.tutor_id}-profile")
+    assert response.status_code == 200
+    assert existing_tutor.tutor_id == 1
+    assert b"Tutor Profile</h2>" in response.data
+
+
+def test_tutor_profile_failure(client):
+    """
+    Test that tutor profile pages should not exist for tutor IDs not in the database.
+    """
+    # Since the IDs are auto-incremented starting from 1, this should give a non-existant ID
+    invalid_id = len(Tutor.query.all()) + 1
+    response = client.get(f"/tutor-{invalid_id}-profile")
+    # Page not found error should occur
+    assert response.status_code == 404
+
+
+def test_tutor_login_get(client):
+    """
+    Test that Tutor Login page returns an ok response when retrieved,
+    and that the page contains the expected form element for inputting data
+    and a button element to post the data.
+    This ensures the correct html template is being used.
+    """
+    response = client.get("/tutor-login")
+    assert response.status_code == 200
+    assert b'<form id="tutor-login-form">' in response.data
+    assert b'<button type="submit">Login</button>' in response.data
+
+
+def test_current_user_session_state(client):
+    """
+    Test that the session states are not being set or modified
+    when making get requests to various pages.
+    Should only be set when a requests succeeds for logging in and out.
+    """
+    response = client.get("/")
+    assert "current_user_id" not in session
+    assert "current_user_type" not in session
+    response = client.get("/tutor-login")
+    assert "current_user_id" not in session
+    assert "current_user_type" not in session
+    response = client.get("/tutor-signup")
+    assert "current_user_id" not in session
+    assert "current_user_type" not in session
+    response = client.get("/browse_tutors")
+    assert "current_user_id" not in session
+    assert "current_user_type" not in session
+
+
+def test_tutor_login_post_success(client):
+    """
+    Test that a post request made to login as a tutor can be sent successfully,
+    and that the session's current user ID and type are set correctly.
+    Test also that the correct message is sent right before
+    the page redirects to the tutor account page.
+    """
+    response = client.post(
+        "/tutor-login",
+        data={
+            "email": "john.doe@tutorplanet.co.uk",
+            "password": "password",
+        },
+    )
+    assert response.status_code == 200
+    assert session["current_user_id"] == 1
+    assert session["current_user_type"] == "Tutor"
+    assert response.json["message"] == "Successful login"
+
+
+def test_tutor_login_post_failure(client):
+    """
+    Test that trying to login as a tutor with either the wrong credentials
+    will not cause any changes the current user session states,
+    and will return the appropriate error message to the user on the page.
+    """
+    invalid_password = "123"
+    response = client.post(
+        "/tutor-login",
+        data={
+            "email": "john.doe@tutorplanet.co.uk",
+            "password": invalid_password,
+        },
+    )
+    assert response.status_code == 200
+    assert session["current_user_id"] is None
+    assert session["current_user_type"] is None
+    assert (
+        response.json["message"] == "Login failed. Please check the email and password."
+    )
+
+    invalid_email = "123@tutorplanet.org"
+    response = client.post(
+        "/tutor-login",
+        data={
+            "email": invalid_email,
+            "password": "password",
+        },
+    )
+    assert response.status_code == 200
+    assert session["current_user_id"] is None
+    assert session["current_user_type"] is None
+    assert (
+        response.json["message"] == "Login failed. Please check the email and password."
+    )
+
+
+def test_tutor_account_success(client):
+    pass
+
+
+def test_tutor_account_failure(client):
+    pass
