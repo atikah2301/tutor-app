@@ -1,13 +1,11 @@
-<!-- tutor-signup.html -->
+<!-- tutor-login.html -->
 {% extends "base.html" %}
 
 {% block content %}
 
-<h2>Tutor Signup</h2>
+<h2>Tutor Login</h2>
 
-<form id="tutor-signup-form">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required><br>
+<form id="tutor-login-form">
 
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required><br>
@@ -15,26 +13,29 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required><br>
 
-    <button type="submit">Sign Up</button>
+    <button type="submit">Login</button>
 </form>
 
-<div id="tutor-signup-form-message"></div>
+<div id="tutor-login-form-message"></div>
 
 <script>
-    document.getElementById('tutor-signup-form').addEventListener('submit', function (event) {
+    document.getElementById('tutor-login-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
         var formData = new FormData(this);
 
-        fetch('/tutor-signup', {
+        fetch('/tutor-login', {
             method: 'POST',
             body: formData
         })
-            .then(response => {
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                document.getElementById('tutor-signup-form-message').textContent = data.message;
+                if (data.message === "Successful login") {
+                    window.location.href = `/tutor-${data.tutor_id}-account`;
+                }
+                else {
+                    document.getElementById('tutor-login-form-message').textContent = data.message;
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
