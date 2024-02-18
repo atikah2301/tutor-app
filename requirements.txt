@@ -4,3 +4,4 @@ Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.27
 pytest==8.0.1
 playwright==1.41.2
+pytest-mock==3.12.0
