@@ -1,15 +1,17 @@
-import csv
 import logging
-import os
 
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
-LOG_PATH = 'app.log'
-logging.basicConfig(level=logging.INFO, filename=LOG_PATH, filemode='a', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+LOG_PATH = "app.log"
+logging.basicConfig(
+    level=logging.INFO,
+    filename=LOG_PATH,
+    filemode="a",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 DATABASE_URL = "sqlite:///database.db"
 engine = create_engine(DATABASE_URL)
@@ -35,9 +37,9 @@ def seed_database():
     # Delete and recreate all the tables
     db.drop_all()
     db.create_all()
-    
+
     seed_data = [
-        ["1234", "John Doe", "john.doe@tutorplanet.co.uk"], 
+        ["1234", "John Doe", "john.doe@tutorplanet.co.uk"],
         ["1245", "Jane Smith", "jane.smith@tutorplanet.co.uk"],
     ]
     for row in seed_data:
@@ -73,4 +75,3 @@ with app.app_context():
 if __name__ == "__main__":
     logging.info("Running flask app...")
     app.run(debug=False)
-    
