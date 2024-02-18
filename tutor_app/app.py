@@ -1,10 +1,9 @@
 import logging
 
-from flask import Flask, jsonify, render_template, redirect, url_for, session, request
+from flask import Flask, jsonify, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker
 
 LOG_PATH = "app.log"
 logging.basicConfig(
@@ -16,7 +15,6 @@ logging.basicConfig(
 
 DATABASE_URL = "sqlite:///database.db"
 engine = create_engine(DATABASE_URL)
-# Session = sessionmaker(bind=engine)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
@@ -64,21 +62,16 @@ def tutor_signup():
         password = request.form["password"]
 
         try:
-            tutor = Tutor(name=name, email=email, password=password)
-            db.session.add(tutor)
+            new_tutor = Tutor(name=name, email=email, password=password)
+            db.session.add(new_tutor)
             db.session.commit()
             return jsonify(message="You've successfully signed up as a tutor!")
 
         except IntegrityError as e:
+            logging.error(e)
             db.session.rollback()
             return jsonify(
                 message="The email you have entered is already in use for an existing tutor account."
-            )
-
-        except Exception as e:
-            db.session.rollback()
-            return jsonify(
-                message="An error occurred while signing up. Please try again later."
             )
 
 
@@ -116,7 +109,7 @@ def tutor_account(tutor_id):
     # logging.info(f"current_user_id={current_user_id}, current_user_type={current_user_type}")
 
     # tutor = Tutor.query.get_or_404(tutor_id)
-    
+
     # return render_template("tutor-account.html", tutor=tutor)
 
     if "current_user_id" not in session:
@@ -125,7 +118,9 @@ def tutor_account(tutor_id):
 
     current_user_id = session["current_user_id"]
     current_user_type = session["current_user_type"]
-    logging.info(f"current_user_id={current_user_id}, current_user_type={current_user_type}")
+    logging.info(
+        f"current_user_id={current_user_id}, current_user_type={current_user_type}"
+    )
 
     if current_user_id == None:
         # Occurs when the user is not logged in
@@ -144,7 +139,6 @@ def tutor_account(tutor_id):
         return render_template("permission_denied.html")
 
 
-
 def seed_database():
     # Reset all the tables
     db.drop_all()
@@ -154,8 +148,8 @@ def seed_database():
         ["John Doe", "john.doe@tutorplanet.co.uk", "password"],
         ["Jane Smith", "jane.smith@tutorplanet.co.uk", "password"],
     ]
-    for row in seed_data:
-        tutor = Tutor(name=row[0], email=row[1], password=row[2])
+    for name, email, password in seed_data:
+        tutor = Tutor(name=name, email=email, password=password)
         db.session.add(tutor)
         db.session.commit()
         logging.info(f"Seed data {tutor} added")
