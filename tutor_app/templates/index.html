@@ -1,21 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- index.html -->
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutor Planet - Homepage</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
+{% block content %}
 
-<body>
-    <h1>Welcome to Tutor Planet!</h1>
-    <p>Here you can easily find and book the perfect tutor for your child for 11+ exam preparation.</p>
+<h2>Welcome to Tutor Planet!</h2>
+<p>Here you can easily find and book the perfect tutor for your child for 11+ exam preparation.</p>
 
-    <button id="goToBrowseTutorsButton">Browse Tutors</button>
-    <button id="goToSignUpAsTutorButton">Sign Up as a Tutor</button>
+<button id="goToBrowseTutorsButton">Browse Tutors</button>
+<button id="goToSignUpAsTutorButton">Sign Up as a Tutor</button>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
-</html>
+{% endblock %}

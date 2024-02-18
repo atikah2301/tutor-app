@@ -1,33 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- tutor-profile.html -->
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ tutor.name }}'s Tutor Profile</title>
-</head>
+{% block content %}
 
-<body>
-    <h1>{{ tutor.name }}'s Tutor Profile</h1>
+<h2>{{ tutor.name }}'s Tutor Profile</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Tutor ID</th>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ tutor.tutor_id }}</td>
-                <td>{{ tutor.name }}</td>
-                <td>{{ tutor.email }}</td>
-            </tr>
-        </tbody>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th>Tutor ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ tutor.tutor_id }}</td>
+            <td>{{ tutor.name }}</td>
+            <td>{{ tutor.email }}</td>
+        </tr>
+    </tbody>
+</table>
 
-    <a href="/">Back to Home</a>
-</body>
+<a href="/">Back to Home</a>
 
-</html>
+{% endblock %}

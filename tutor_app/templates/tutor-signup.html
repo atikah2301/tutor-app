@@ -1,57 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- tutor-signup.html -->
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TutorPlanet</title>
-</head>
+{% block content %}
 
-<body>
-    <h1>Tutor Signup</h1>
+<h2>Tutor Signup</h2>
 
-    <form id="tutor-signup-form">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br>
+<form id="tutor-signup-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br>
 
-        <button type="submit">Sign Up</button>
-    </form>
+    <button type="submit">Sign Up</button>
+</form>
 
-    <div id="tutor-signup-form-message"></div>
+<div id="tutor-signup-form-message"></div>
 
-    <script>
-        document.getElementById('tutor-signup-form').addEventListener('submit', function (event) {
-            event.preventDefault();
+<script>
+    document.getElementById('tutor-signup-form').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-            var formData = new FormData(this);
+        var formData = new FormData(this);
 
-            fetch('/tutor-signup', {
-                method: 'POST',
-                body: formData
+        fetch('/tutor-signup', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok')
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok')
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById('tutor-signup-form-message').textContent = data.message;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('tutor-signup-form-message').textContent = 'An error occurred. Please try again later.';
-                });
-        });
-    </script>
+            .then(data => {
+                document.getElementById('tutor-signup-form-message').textContent = data.message;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('tutor-signup-form-message').textContent = 'An error occurred. Please try again later.';
+            });
+    });
+</script>
 
-    <a href="/">Back to Home</a>
-</body>
+<a href="/">Back to Home</a>
 
-</html>
+
+{% endblock %}

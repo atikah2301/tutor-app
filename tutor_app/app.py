@@ -97,4 +97,4 @@ with app.app_context():
 
 if __name__ == "__main__":
     logging.info("Running flask app...")
-    app.run(debug=False)
+    app.run(debug=True)

@@ -1,35 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- browse-tutors.html -->
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutors List</title>
-</head>
+{% block content %}
 
-<body>
-    <h1>Browse Tutors</h1>
+<h2>Browse Tutors</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Tutor ID</th>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tutor in tutors %}
-            <tr>
-                <td>{{ tutor.tutor_id }}</td>
-                <td>{{ tutor.name }}</td>
-                <td>{{ tutor.email }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th>Tutor ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tutor in tutors %}
+        <tr>
+            <td>{{ tutor.tutor_id }}</td>
+            <td>{{ tutor.name }}</td>
+            <td>{{ tutor.email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <a href="/">Back to Home</a>
-</body>
+<a href="/">Back to Home</a>
 
-</html>
+{% endblock %}
