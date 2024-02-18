@@ -5,20 +5,20 @@
 
 <h2>Browse Tutors</h2>
 
+<p>Click on the tutor's name to see their full profile</p>
+
 <table>
     <thead>
         <tr>
             <th>Tutor ID</th>
             <th>Name</th>
-            <th>Email</th>
         </tr>
     </thead>
     <tbody>
         {% for tutor in tutors %}
         <tr>
             <td>{{ tutor.tutor_id }}</td>
-            <td>{{ tutor.name }}</td>
-            <td>{{ tutor.email }}</td>
+            <td><a href="/tutor-{{ tutor.tutor_id }}-profile">{{ tutor.name }}</a></td>
         </tr>
         {% endfor %}
     </tbody>
