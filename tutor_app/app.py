@@ -41,11 +41,11 @@ def seed_database():
     db.create_all()
 
     seed_data = [
-        ["1234", "John Doe", "john.doe@tutorplanet.co.uk", "iAmJohn123"],
-        ["1245", "Jane Smith", "jane.smith@tutorplanet.co.uk", "jane1sCool"],
+        ["John Doe", "john.doe@tutorplanet.co.uk", "iAmJohn123"],
+        ["Jane Smith", "jane.smith@tutorplanet.co.uk", "jane1sCool"],
     ]
     for row in seed_data:
-        tutor = Tutor(tutor_id=int(row[0]), name=row[1], email=row[2], password=row[3])
+        tutor = Tutor(name=row[0], email=row[1], password=row[2])
         logging.info(f"Seed data {tutor} added")
         db.session.add(tutor)
         db.session.commit()
